@@ -7,13 +7,17 @@ use Wink;
 
 my $wink = Wink->new({ device => '/dev/hidraw0' });
 
-$wink->fadeto(255, 0, 0);
+$wink->fadeto('ff0000');
 sleep 1;
-$wink->fadeto(0, 255, 0, 1);
+
+$wink->fadeto('00ff00', 1);
 sleep 1;
-$wink->fadeto(0, 0, 255, 2);
+
+$wink->fadeto('0000ff', 2);
 sleep 1;
-$wink->fadeto(255, 255, 255);
+
+$wink->fadeto('ffffff');
 sleep 2;
-$wink->fadeto(0, 0, 0);
+
+$wink->off;
 

@@ -29,18 +29,38 @@ sub BUILD {
   $_[0]->_fh;
 }
 
-sub fadeto {
-  my ($self, $r, $g, $b, $led, $millis) = @_;
-  $led ||= 0; # or 1, or 2
-  $millis ||= 50;
+my sub _to_rgb ($arg) {
+  $arg =~ s/^#//;
 
+  $arg = "$1$1$2$2$3$3" if $arg =~ /\A([0-9a-f])([0-9a-f])([0-9a-f])\z/ia;
+
+  Carp::confess("bad rgb") unless $arg =~ /\A[0-9a-f]{6}/ia;
+
+  return unpack 'C*', pack 'H*', $arg;
+}
+
+sub _send ($self, $chr, @sixargs) {
   ioctl(
     $self->_fh,
     $HIDIOCSFEATURE,
-    pack("C*", 1, ord('c'), $r, $g, $b, $millis >> 8, $millis % 0xFF, $led, 0)
+    pack("C*", 1, ord($chr), @sixargs, 0),
   );
 
   return;
+}
+
+sub fadeto {
+  my ($self, $rgb, $led, $millis) = @_;
+  $led ||= 0; # or 1, or 2
+  $millis ||= 50;
+
+  $self->_send(c => _to_rgb($rgb), $millis >> 8, $millis % 0xFF, $led);
+
+  return;
+}
+
+sub off ($self, $led = 0) {
+  $self->_send(n => (0, 0, 0), 0, 0, $led);
 }
 
 __PACKAGE__->meta->make_immutable;
