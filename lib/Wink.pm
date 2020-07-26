@@ -49,14 +49,17 @@ sub _send ($self, $chr, @sixargs) {
   return;
 }
 
-sub fadeto {
-  my ($self, $rgb, $led, $millis) = @_;
-  $led ||= 0; # or 1, or 2
-  $millis ||= 50;
+sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
+  return $self->set($rgb, $led) if $ms == 0;
 
-  $self->_send(c => _to_rgb($rgb), $millis >> 8, $millis % 0xFF, $led);
+  $ms = $ms / 10;
+  $self->_send(c => _to_rgb($rgb), $ms >> 8, $ms % 0xFF, $led);
 
   return;
+}
+
+sub set ($self, $rgb, $led = 0) {
+  $self->_send(n => _to_rgb($rgb), 0, 0, $led);
 }
 
 sub off ($self, $led = 0) {
