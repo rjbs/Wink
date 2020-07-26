@@ -10,10 +10,10 @@ my $wink = Wink->new({ device => '/dev/hidraw0' });
 $wink->fadeto('ff0000');
 sleep 1;
 
-$wink->fadeto('00ff00', 1);
+$wink->fadeto('00ff00', 50, 1);
 sleep 1;
 
-$wink->fadeto('0000ff', 2);
+$wink->fadeto('0000ff', 50, 2);
 sleep 1;
 
 $wink->fadeto('ffffff');
