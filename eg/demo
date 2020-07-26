@@ -1,0 +1,18 @@
+use v5.30.0;
+use warnings;
+
+use lib 'lib';
+use Wink;
+
+my $wink = Wink->new({ device => '/dev/hidraw0' });
+
+$wink->fadeto(255, 0, 0);
+sleep 1;
+$wink->fadeto(0, 255, 0, 1);
+sleep 1;
+$wink->fadeto(0, 0, 255, 2);
+sleep 1;
+$wink->fadeto(255, 255, 255);
+sleep 2;
+$wink->fadeto(0, 0, 0);
+
