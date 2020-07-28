@@ -8,7 +8,7 @@ use Wink;
 
 use experimental qw(signatures);
 
-my $Wink = Wink->new({ device => $ENV{WINK_DEVICE} // '/dev/hidraw0' });
+my $Wink = Wink->get_driver;
 
 my sub error ($str) {
   return [
