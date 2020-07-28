@@ -13,10 +13,16 @@ has command => (
   default => 'blink1-tool',
 );
 
+has device_id => (
+  is  => 'ro',
+  isa => 'Str',
+  default => '0', # can also be "all"
+);
+
 sub _do_command ($self, @args) {
   open my $out, '>&STDOUT';
   close STDOUT;
-  system($self->command, @args);
+  system($self->command, '--id', $self->device_id, @args);
 
   warn "failed to run command" if $?;
 
