@@ -1,4 +1,4 @@
-package Wink::Driver::Comand;
+package Wink::Driver::Command;
 
 use v5.30.0;
 
