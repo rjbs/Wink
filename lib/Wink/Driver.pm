@@ -1,4 +1,4 @@
-package Wink::Role;
+package Wink::Driver;
 
 use v5.30.0;
 

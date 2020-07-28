@@ -1,9 +1,9 @@
-package Wink::ViaDevice;
+package Wink::Driver::Device;
 
 use v5.30.0;
 
 use Moose;
-with 'Wink::Role';
+with 'Wink::Driver';
 
 use experimental qw(signatures);
 
