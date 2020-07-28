@@ -33,4 +33,22 @@ sub get_driver {
   return $Via{$which}->($how);
 }
 
+sub get_bank ($self) {
+  confess("\$WINK_BANK not defined") unless defined $ENV{WINK_BANK};
+
+  my %wink;
+  my @entries = split /,/, $ENV{WINK_BANK};
+  for my $entry (@entries) {
+    my ($name, $which, $how) = split /(?<!:):(?!:)/, $entry, 3;
+
+    confess(qq{wink "$name" defined multiple times in \$WINK_BANK})
+      if $wink{$name};
+
+    $wink{$name} = $self->get_driver($which, $how);
+  }
+
+  require Wink::Bank;
+  return Wink::Bank->new({ winks => \%wink });
+}
+
 1;
