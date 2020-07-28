@@ -1,10 +1,13 @@
-package Wink;
+package Wink::ViaDevice;
 
 use v5.30.0;
 
 use Moose;
+with 'Wink::Role';
 
 use experimental qw(signatures);
+
+use Wink::Util qw(to_rgb);
 
 my $HIDIOCSFEATURE = 3221833734;
 
@@ -29,16 +32,6 @@ sub BUILD {
   $_[0]->_fh;
 }
 
-my sub _to_rgb ($arg) {
-  $arg =~ s/^#//;
-
-  $arg = "$1$1$2$2$3$3" if $arg =~ /\A([0-9a-f])([0-9a-f])([0-9a-f])\z/ia;
-
-  Carp::confess("bad rgb") unless $arg =~ /\A[0-9a-f]{6}/ia;
-
-  return unpack 'C*', pack 'H*', $arg;
-}
-
 sub _send ($self, $chr, @sixargs) {
   ioctl(
     $self->_fh,
@@ -53,13 +46,13 @@ sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
   return $self->set($rgb, $led) if $ms == 0;
 
   $ms = $ms / 10;
-  $self->_send(c => _to_rgb($rgb), $ms >> 8, $ms % 0xFF, $led);
+  $self->_send(c => to_rgb($rgb), $ms >> 8, $ms % 0xFF, $led);
 
   return;
 }
 
 sub set ($self, $rgb, $led = 0) {
-  $self->_send(n => _to_rgb($rgb), 0, 0, $led);
+  $self->_send(n => to_rgb($rgb), 0, 0, $led);
 }
 
 sub off ($self, $led = 0) {
