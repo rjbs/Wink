@@ -13,15 +13,25 @@ has command => (
   default => 'blink1-tool',
 );
 
+sub _do_command ($self, @args) {
+  open my $out, '>&STDOUT';
+  close STDOUT;
+  system($self->command, @args);
+
+  warn "failed to run command" if $?;
+
+  open STDOUT, '>&', $out;
+
+  return;
+}
+
 sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
-  system(
-    $self->command,
+  $self->_do_command(
     ($ms == 0 ? () : ('-m', $ms)),
     '--rgb', $rgb,
     '--led', $led,
   );
 
-  warn "failed to run command" if $?;
   return;
 }
 
@@ -30,7 +40,7 @@ sub set ($self, $rgb, $led = 0) {
 }
 
 sub off ($self, $led = 0) {
-  system($self->command, '--led', $led, '--off');
+  $self->_do_command('--led', $led, '--off');
 }
 
 __PACKAGE__->meta->make_immutable;
