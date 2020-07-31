@@ -147,7 +147,7 @@ sub _add_instruction ($self, $instr) {
 
   confess "too many parameters to method call" if @wtf;
 
-  my $sync = delete $arg->{sync};
+  my $sync = $arg->{sync};
 
   for my $thing (
     $self->$method($arg),
