@@ -99,29 +99,22 @@ sub _instr_sync ($self, $arg) {
   my $time = $queue_time->{$name};
 
   unless ($time) {
-    return {}; # could put this in $NO_OP? I dunno. -- rjbs, 2020-07-31
+    return;
   }
 
   return {
     time  => { map {; $_ => -$time } $self->bank->device_names },
     code  => sub {
-      warn "sync with $name: sleeping $time ms\n";
       Time::HiRes::usleep($time * 1_000);
     },
   }
 }
 
-sub _instr_shutdown ($self, $arg) {
+sub _instr_syncoff ($self, $arg) {
   confess "shutdown takes no arguments" if keys %$arg;
   return (
     $self->_instr_sync({}),
-    {
-      time  => {},
-      code  => sub {
-        my $bank = $self->bank;
-        $bank->device_named($_)->off for $bank->device_names;
-      },
-    },
+    $self->_instr_off({}),
   );
 }
 
@@ -133,7 +126,18 @@ sub _add_instruction ($self, $instr) {
 
   confess "too many parameters to method call" if @wtf;
 
-  for my $thing ($self->$method($arg)) {
+  my $sync = delete $arg->{sync};
+
+  for my $thing (
+    $self->$method($arg),
+  ) {
+    $self->_update_queue_times($thing->{time})  if $thing->{time};
+    $self->_add_coderef($thing->{code})         if $thing->{code};
+  }
+
+  for my $thing (
+    ($sync ? $self->_instr_sync({ device => $arg->{device} }) : ()),
+  ) {
     $self->_update_queue_times($thing->{time})  if $thing->{time};
     $self->_add_coderef($thing->{code})         if $thing->{code};
   }
@@ -149,8 +153,9 @@ sub from_instructions ($class, $instr) {
 }
 
 sub execute ($self, $arg = {}) {
-  $self->_add_instruction([ 'shutdown' ])
-    unless exists $arg->{shutdown} && ! $arg->{shutdown};
+  unless (exists $arg->{shutdown} && ! $arg->{shutdown}) {
+    $self->_add_instruction([ syncoff => {} ]);
+  }
 
   $self->$_ for $self->_coderefs;
 }
