@@ -62,7 +62,7 @@ sub _instr_set ($self, $arg) {
   return {
     time => { map {; $_ => $fade + $hold } @names },
     code => sub ($self) {
-      $self->bank->device_named($_)->fadeto($arg->{rgb}, $fade) for @names;
+      $self->bank->device_named($_)->fadeto($arg->{rgb}, $fade, $led) for @names;
     },
   }
 }
