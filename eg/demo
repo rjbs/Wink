@@ -4,23 +4,17 @@ use warnings;
 
 use lib 'lib';
 use Wink;
+use Wink::Program;
 
 my $bank = Wink->get_bank;
 
-for my $name (sort $bank->device_names) {
-  my $device = $bank->device_named($name);
+my $program = $bank->build_program([
+  [ set   => { device => 'left',  rgb => 'ff0000' } ],
+  [ sleep => { time   => 250 } ],
+  [ set   => { device => 'right', rgb => 'ff0000' } ],
+  [ sleep => { time   => 250 } ],
+  [ set   => { device => 'mid',   rgb => 'ff0000' } ],
+  [ sleep => { time   => 250 } ],
+]);
 
-  $device->fadeto('ff0000');
-  sleep 1;
-
-  $device->fadeto('00ff00', 50, 1);
-  sleep 1;
-
-  $device->fadeto('0000ff', 50, 2);
-  sleep 1;
-
-  $device->fadeto('ffffff');
-  sleep 2;
-
-  $device->off;
-}
+$program->execute;

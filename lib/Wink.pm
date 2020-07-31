@@ -9,31 +9,31 @@ use Carp qw(confess);
 
 my %Via = (
   command => sub ($arg) {
-    require Wink::Driver::Command;
+    require Wink::Device::Command;
     my ($command, $device_id) = split /:/, $arg, 2;
-    Wink::Driver::Command->new({
+    Wink::Device::Command->new({
       command => $command,
       (length $device_id ? (device_id => $device_id) : ()),
     });
   },
   device => sub ($arg) {
-    require Wink::Driver::Device;
-    Wink::Driver::Device->new({ device => $arg });
+    require Wink::Device::HIDRaw;
+    Wink::Device::HIDRaw->new({ device => $arg });
   },
 );
 
-sub get_driver {
+sub get_device {
   my $self = shift;
 
   my ($which, $how);
   if (@_) {
     ($which, $how) = @_;
-  } elsif ($ENV{WINK_DRIVER}) {
-    ($which, $how) = split /(?<!:):(?!:)/, $ENV{WINK_DRIVER}, 2;
+  } elsif ($ENV{WINK_DEVICE}) {
+    ($which, $how) = split /(?<!:):(?!:)/, $ENV{WINK_DEVICE}, 2;
   }
 
-  confess("no driver specification available") unless $which;
-  confess("unknown driver type") unless $Via{$which};
+  confess("no device specification available") unless $which;
+  confess("unknown device type") unless $Via{$which};
   return $Via{$which}->($how);
 }
 
@@ -48,7 +48,7 @@ sub get_bank ($self) {
     confess(qq{device "$name" defined multiple times in \$WINK_BANK})
       if $device{$name};
 
-    $device{$name} = $self->get_driver($which, $how);
+    $device{$name} = $self->get_device($which, $how);
   }
 
   require Wink::Bank;

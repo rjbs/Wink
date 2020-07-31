@@ -1,9 +1,9 @@
-package Wink::Driver::Command;
+package Wink::Device::Command;
 
 use v5.30.0;
 
 use Moose;
-with 'Wink::Driver';
+with 'Wink::Device';
 
 use experimental qw(signatures);
 
@@ -33,9 +33,9 @@ sub _do_command ($self, @args) {
 
 sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
   $self->_do_command(
-    ($ms == 0 ? () : ('-m', $ms)),
-    '--rgb', $rgb,
-    '--led', $led,
+    '-m',     $ms,
+    '--rgb',  $rgb,
+    '--led',  $led,
   );
 
   return;
@@ -43,10 +43,6 @@ sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
 
 sub set ($self, $rgb, $led = 0) {
   return $self->fadeto($rgb, 0, $led);
-}
-
-sub off ($self, $led = 0) {
-  $self->_do_command('--led', $led, '--off');
 }
 
 __PACKAGE__->meta->make_immutable;

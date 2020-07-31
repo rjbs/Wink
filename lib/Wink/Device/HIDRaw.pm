@@ -1,9 +1,9 @@
-package Wink::Driver::HIDRaw;
+package Wink::Device::HIDRaw;
 
 use v5.30.0;
 
 use Moose;
-with 'Wink::Driver';
+with 'Wink::Device';
 
 use experimental qw(signatures);
 
@@ -53,10 +53,6 @@ sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
 
 sub set ($self, $rgb, $led = 0) {
   $self->_send(n => to_rgb($rgb), 0, 0, $led);
-}
-
-sub off ($self, $led = 0) {
-  $self->_send(n => (0, 0, 0), 0, 0, $led);
 }
 
 __PACKAGE__->meta->make_immutable;
