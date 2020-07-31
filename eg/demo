@@ -23,6 +23,28 @@ my $program = $bank->build_program([
   [ set     => { device => 'mid',   rgb => '008888', hold => 1000, sync => 1    } ],
   [ set     => { device => 'mid',   rgb => '000000', fade => 1000, sync => 1    } ],
   [ set     => { rgb => '000000', fade => 2000 } ],
+
+  (
+    [ off   => { led => 2 } ],
+    [ off   => { led => 2 } ],
+    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+    [ sync  => {} ],
+    [ off   => { led => 1 } ],
+    [ off   => { led => 1 } ],
+    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+    [ sync  => {} ],
+    [ off   => { led => 2 } ],
+    [ off   => { led => 2 } ],
+    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+    [ sync  => {} ],
+    [ off   => { led => 1 } ],
+    [ off   => { led => 1 } ],
+    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+  ),
 ]);
 
 $program->execute;
