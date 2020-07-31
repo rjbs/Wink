@@ -10,7 +10,11 @@ use Carp qw(confess);
 my %Via = (
   command => sub ($arg) {
     require Wink::Driver::Command;
-    Wink::Driver::Command->new({ command => $arg });
+    my ($command, $device_id) = split /:/, $arg, 2;
+    Wink::Driver::Command->new({
+      command => $command,
+      (length $device_id ? (device_id => $device_id) : ()),
+    });
   },
   device => sub ($arg) {
     require Wink::Driver::Device;

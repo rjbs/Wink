@@ -1,4 +1,4 @@
-package Wink::Driver::Device;
+package Wink::Driver::HIDRaw;
 
 use v5.30.0;
 

@@ -5,19 +5,22 @@ use warnings;
 use lib 'lib';
 use Wink;
 
-my $wink = Wink->new({ device => '/dev/hidraw0' });
+my $bank = Wink->get_bank;
 
-$wink->fadeto('ff0000');
-sleep 1;
+for my $name (sort $bank->device_names) {
+  my $device = $bank->device_named($name);
 
-$wink->fadeto('00ff00', 50, 1);
-sleep 1;
+  $device->fadeto('ff0000');
+  sleep 1;
 
-$wink->fadeto('0000ff', 50, 2);
-sleep 1;
+  $device->fadeto('00ff00', 50, 1);
+  sleep 1;
 
-$wink->fadeto('ffffff');
-sleep 2;
+  $device->fadeto('0000ff', 50, 2);
+  sleep 1;
 
-$wink->off;
+  $device->fadeto('ffffff');
+  sleep 2;
 
+  $device->off;
+}
