@@ -9,13 +9,20 @@ use Wink::Program;
 my $bank = Wink->get_bank;
 
 my $program = $bank->build_program([
-  [ set   => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
-  [ sleep => { time   => 1000 } ],
-  [ set   => { device => 'right', rgb => 'ff0000' } ],
-  [ sync  => {} ],
-  [ off   => {} ],
-  [ set   => { device => 'mid',   rgb => 'ffffff' } ],
-  [ set   => { device => 'mid',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
+  [ set     => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
+  [ sleep   => { time   => 1000 } ],
+  [ set     => { device => 'right', rgb => 'ff0000' } ],
+  [ syncoff => {} ],
+
+  [ set     => { device => 'mid',   rgb => 'ffffff' } ],
+  [ set     => { device => 'mid',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
+  [ syncoff => {} ],
+
+  [ set     => { device => 'left',  rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+  [ set     => { device => 'right', rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+  [ set     => { device => 'mid',   rgb => '008888', hold => 1000, sync => 1    } ],
+  [ set     => { device => 'mid',   rgb => '000000', fade => 1000, sync => 1    } ],
+  [ set     => { rgb => '000000', fade => 2000 } ],
 ]);
 
 $program->execute;
