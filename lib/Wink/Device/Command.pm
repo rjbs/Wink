@@ -31,7 +31,7 @@ sub _do_command ($self, @args) {
   return;
 }
 
-sub fadeto ($self, $rgb, $ms = 50, $led = 0) {
+sub fadeto ($self, $rgb, $ms = 0, $led = 0) {
   $self->_do_command(
     '-m',     $ms,
     '--rgb',  $rgb,
