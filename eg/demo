@@ -8,43 +8,74 @@ use Wink::Program;
 
 my $bank = Wink->get_bank;
 
-my $program = $bank->build_program([
-  [ set     => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
-  [ sleep   => { time   => 1000 } ],
-  [ set     => { device => 'right', rgb => 'ff0000' } ],
-  [ syncoff => {} ],
+if (1) {
+  my $program = $bank->build_program([
+    [ set     => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
+    [ sleep   => { time   => 1000 } ],
+    [ set     => { device => 'right', rgb => 'ff0000' } ],
+    [ syncoff => {} ],
 
-  [ set     => { device => 'mid',   rgb => 'ffffff' } ],
-  [ set     => { device => 'mid',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
-  [ syncoff => {} ],
+    [ set     => { device => 'mid',   rgb => 'ffffff' } ],
+    [ set     => { device => 'mid',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
+    [ syncoff => {} ],
 
-  [ set     => { device => 'left',  rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
-  [ set     => { device => 'right', rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
-  [ set     => { device => 'mid',   rgb => '008888', hold => 1000, sync => 1    } ],
-  [ set     => { device => 'mid',   rgb => '000000', fade => 1000, sync => 1    } ],
-  [ set     => { rgb => '000000', fade => 2000 } ],
+    [ set     => { device => 'left',  rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+    [ set     => { device => 'right', rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+    [ set     => { device => 'mid',   rgb => '008888', hold => 1000, sync => 1    } ],
+    [ set     => { device => 'mid',   rgb => '000000', fade => 1000, sync => 1    } ],
+    [ set     => { rgb => '000000', fade => 2000 } ],
 
-  (
-    [ off   => { led => 2 } ],
-    [ off   => { led => 2 } ],
-    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
-    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
-    [ sync  => {} ],
-    [ off   => { led => 1 } ],
-    [ off   => { led => 1 } ],
-    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
-    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
-    [ sync  => {} ],
-    [ off   => { led => 2 } ],
-    [ off   => { led => 2 } ],
-    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
-    [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
-    [ sync  => {} ],
-    [ off   => { led => 1 } ],
-    [ off   => { led => 1 } ],
-    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
-    [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
-  ),
-]);
+    (
+      [ off   => { led => 2 } ],
+      [ off   => { led => 2 } ],
+      [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+      [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+      [ sync  => {} ],
+      [ off   => { led => 1 } ],
+      [ off   => { led => 1 } ],
+      [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+      [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+      [ sync  => {} ],
+      [ off   => { led => 2 } ],
+      [ off   => { led => 2 } ],
+      [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+      [ set   => { led => 1, rgb => 'ff0000', hold => 100 } ],
+      [ sync  => {} ],
+      [ off   => { led => 1 } ],
+      [ off   => { led => 1 } ],
+      [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+      [ set   => { led => 2, rgb => '0000ff', hold => 100 } ],
+    ),
+    [ syncoff => {} ],
 
-$program->execute;
+  ]);
+
+  $program->execute;
+}
+
+{
+  my @west = map { (
+    [ set  => { device => $_, rgb => '880008', led => 1, fade => 250 } ],
+    [ sync => {} ],
+    [ set  => { device => $_, rgb => '000000', led => 1, fade => 250 } ],
+    [ set  => { device => $_, rgb => '880008', led => 2, fade => 250 } ],
+    [ sync => {} ],
+    [ set  => { device => $_, rgb => '000000', led => 2, fade => 250 } ],
+  ) } qw( right mid left );
+
+  my @east = map { (
+    [ set  => { device => $_, rgb => '880008', led => 2, fade => 250 } ],
+    [ sync => {} ],
+    [ set  => { device => $_, rgb => '000000', led => 2, fade => 250 } ],
+    [ set  => { device => $_, rgb => '880008', led => 1, fade => 250 } ],
+    [ sync => {} ],
+    [ set  => { device => $_, rgb => '000000', led => 1, fade => 250 } ],
+  ) } qw( left mid right );
+
+  my $program = $bank->build_program([
+    @west, @east,
+    @west, @east,
+  ]);
+
+  $program->execute;
+}

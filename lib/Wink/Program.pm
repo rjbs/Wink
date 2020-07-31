@@ -29,11 +29,18 @@ has coderefs => (
 );
 
 has queue_times => (
-  lazy  => 1,
+  lazy    => 1,
   reader  => '_queue_times',
+  traits  => [ 'Hash' ],
   default => sub {
-    return { map {; $_ => 0 } $_[0]->bank->device_names };
-  }
+    return {
+      # We need two queues per device.  One per LED.
+      map {; "$_\_1" => 0, "$_\_2" => 0 } $_[0]->bank->device_names
+    };
+  },
+  handles => {
+    _queue_names => 'keys',
+  },
 );
 
 sub _update_queue_times ($self, $update) {
@@ -59,10 +66,12 @@ sub _instr_set ($self, $arg) {
             ? $arg->{device}
             : $self->bank->device_names;
 
+  my @queues = map {; $led ? "$_\_$led" : ("$_\_1", "$_\_2") } @names;
+
   return {
-    time => { map {; $_ => $fade + $hold } @names },
+    time => { map {; $_ => $fade + $hold } @queues },
     code => sub ($self) {
-      $self->bank->device_named($_)->fadeto($arg->{rgb}, $fade, $led) for @names;
+      $self->bank->dispatch($_ => fadeto => ($arg->{rgb}, $fade, $led)) for @names;
     },
   }
 }
@@ -71,10 +80,8 @@ sub _instr_sleep ($self, $arg) {
   my $time = $arg->{time} || confess "can't sleep without time in ms";
 
   return {
-    time  => { map {; $_ => -$time } $self->bank->device_names },
-    code  => sub {
-      Time::HiRes::usleep($time * 1_000);
-    },
+    time  => { map {; $_ => -$time } $self->_queue_names },
+    code  => sub { $self->bank->msleep($time); },
   };
 }
 
@@ -88,25 +95,39 @@ sub _instr_off ($self, $arg) {
 }
 
 sub _instr_sync ($self, $arg) {
-  my $name = $arg->{device};
-  my $queue_time = $self->_queue_times;
+  my $device_name = $arg->{device};
+  my $led         = $arg->{led};
 
-  unless ($name) {
-    ($name) = sort { $queue_time->{$b} <=> $queue_time->{$a} }
-              $self->bank->device_names;
+  my @candidates;
+
+  if (defined $device_name) {
+    @candidates = (defined $led)
+                ? ("$device_name\_$led")
+                : ("$device_name\_1", "$device_name\_2");
+  } else {
+    confess("led specified, but not device!") if defined $led;
+
+    @candidates = $self->_queue_names;
   }
 
-  my $time = $queue_time->{$name};
+  my $queue_time = $self->_queue_times;
+
+  my @unknown = grep {; ! exists $queue_time->{$_} } @candidates;
+
+  confess("unknown queue considered: @unknown") if @unknown;
+
+  my ($queue_name) = sort {; $queue_time->{$b} <=> $queue_time->{$a} }
+                     @candidates;
+
+  my $time = $queue_time->{$queue_name};
 
   unless ($time) {
     return;
   }
 
   return {
-    time  => { map {; $_ => -$time } $self->bank->device_names },
-    code  => sub {
-      Time::HiRes::usleep($time * 1_000);
-    },
+    time  => { map {; $_ => -$time } $self->_queue_names },
+    code  => sub { $self->bank->msleep($time); }
   }
 }
 
