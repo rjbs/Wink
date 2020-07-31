@@ -5,6 +5,8 @@ use Moose;
 
 use experimental qw(signatures);
 
+use Time::HiRes ();
+
 has devices => (
   reader => '_devices',
   is     => 'ro',
@@ -28,6 +30,16 @@ sub build_program ($self, $instr) {
   $program->_add_instruction($_) for @$instr;
 
   return $program;
+}
+
+sub dispatch ($self, $name, $method, @args) {
+  my $device = $self->device_named($name);
+  $device->$method(@args);
+}
+
+sub msleep ($self, $ms) {
+  Time::HiRes::usleep($ms * 1_000);
+  return;
 }
 
 no Moose;

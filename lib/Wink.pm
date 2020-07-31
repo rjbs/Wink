@@ -51,8 +51,17 @@ sub get_bank ($self) {
     $device{$name} = $self->get_device($which, $how);
   }
 
-  require Wink::Bank;
-  return Wink::Bank->new({ devices => \%device });
+  my $class;
+
+  if ($ENV{WINK_DEBUG}) {
+    require Wink::Bank::Debug;
+    $class = 'Wink::Bank::Debug';
+  } else {
+    require Wink::Bank;
+    $class = 'Wink::Bank';
+  }
+
+  return $class->new({ devices => \%device });
 }
 
 1;
