@@ -8,7 +8,7 @@ use Wink::Program;
 
 my $bank = Wink->get_bank;
 
-if (1) {
+if (0) {
   my $program = $bank->build_program([
     [ set     => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
     [ sleep   => { time   => 1000 } ],
@@ -55,26 +55,27 @@ if (1) {
 
 {
   my @west = map { (
-    [ set  => { device => $_, rgb => '880008', led => 1, fade => 250 } ],
+    [ set  => { device => $_, rgb => '880008', led => 1, fade => 100 } ],
     [ sync => {} ],
-    [ set  => { device => $_, rgb => '000000', led => 1, fade => 250 } ],
-    [ set  => { device => $_, rgb => '880008', led => 2, fade => 250 } ],
+    [ set  => { device => $_, rgb => '000000', led => 1, fade => 100 } ],
+    [ set  => { device => $_, rgb => '880008', led => 2, fade => 100 } ],
     [ sync => {} ],
-    [ set  => { device => $_, rgb => '000000', led => 2, fade => 250 } ],
+    [ set  => { device => $_, rgb => '000000', led => 2, fade => 100 } ],
   ) } qw( right mid left );
 
   my @east = map { (
-    [ set  => { device => $_, rgb => '880008', led => 2, fade => 250 } ],
+    [ set  => { device => $_, rgb => '880008', led => 2, fade => 100 } ],
     [ sync => {} ],
-    [ set  => { device => $_, rgb => '000000', led => 2, fade => 250 } ],
-    [ set  => { device => $_, rgb => '880008', led => 1, fade => 250 } ],
+    [ set  => { device => $_, rgb => '000000', led => 2, fade => 100 } ],
+    [ set  => { device => $_, rgb => '880008', led => 1, fade => 100 } ],
     [ sync => {} ],
-    [ set  => { device => $_, rgb => '000000', led => 1, fade => 250 } ],
+    [ set  => { device => $_, rgb => '000000', led => 1, fade => 100 } ],
   ) } qw( left mid right );
 
   my $program = $bank->build_program([
-    @west, @east,
-    @west, @east,
+    @west, [ sync => {} ], @east,
+    [ sync => {} ],
+    @west, [ sync => {} ], @east,
   ]);
 
   $program->execute;

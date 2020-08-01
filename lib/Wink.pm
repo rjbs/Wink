@@ -16,7 +16,7 @@ my %Via = (
       (length $device_id ? (device_id => $device_id) : ()),
     });
   },
-  device => sub ($arg) {
+  hidraw => sub ($arg) {
     require Wink::Device::HIDRaw;
     Wink::Device::HIDRaw->new({ device => $arg });
   },
