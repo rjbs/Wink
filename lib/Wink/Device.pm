@@ -1,6 +1,6 @@
 package Wink::Device;
 
-use v5.30.0;
+use v5.28.0;
 
 use Moose::Role;
 

@@ -1,6 +1,6 @@
 package Wink::Device::Command;
 
-use v5.30.0;
+use v5.28.0;
 
 use Moose;
 with 'Wink::Device';

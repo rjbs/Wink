@@ -1,6 +1,6 @@
 package Wink::Bank;
 
-use v5.30.0;
+use v5.28.0;
 use Moose;
 
 use experimental qw(signatures);
