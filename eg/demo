@@ -10,19 +10,19 @@ my $bank = Wink->get_bank;
 
 if (0) {
   my $program = $bank->build_program([
-    [ set     => { device => 'left',  rgb => 'ff0000', hold => 2000 } ],
+    [ set     => { device => '0',  rgb => 'ff0000', hold => 2000 } ],
     [ sleep   => { time   => 1000 } ],
-    [ set     => { device => 'right', rgb => 'ff0000' } ],
+    [ set     => { device => '2', rgb => 'ff0000' } ],
     [ syncoff => {} ],
 
-    [ set     => { device => 'mid',   rgb => 'ffffff' } ],
-    [ set     => { device => 'mid',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
+    [ set     => { device => '1',   rgb => 'ffffff' } ],
+    [ set     => { device => '1',   rgb => '0000ff', fade => 1000, hold => 1000 } ],
     [ syncoff => {} ],
 
-    [ set     => { device => 'left',  rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
-    [ set     => { device => 'right', rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
-    [ set     => { device => 'mid',   rgb => '008888', hold => 1000, sync => 1    } ],
-    [ set     => { device => 'mid',   rgb => '000000', fade => 1000, sync => 1    } ],
+    [ set     => { device => '0',  rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+    [ set     => { device => '2', rgb => 'ff00ff', fade => 1000, hold => 1000 } ],
+    [ set     => { device => '1',   rgb => '008888', hold => 1000, sync => 1    } ],
+    [ set     => { device => '1',   rgb => '000000', fade => 1000, sync => 1    } ],
     [ set     => { rgb => '000000', fade => 2000 } ],
 
     (
@@ -61,7 +61,7 @@ if (0) {
     [ set  => { device => $_, rgb => '880008', led => 2, fade => 100 } ],
     [ sync => {} ],
     [ set  => { device => $_, rgb => '000000', led => 2, fade => 100 } ],
-  ) } qw( right mid left );
+  ) } qw( 3 2 1 0 );
 
   my @east = map { (
     [ set  => { device => $_, rgb => '880008', led => 2, fade => 100 } ],
@@ -70,7 +70,7 @@ if (0) {
     [ set  => { device => $_, rgb => '880008', led => 1, fade => 100 } ],
     [ sync => {} ],
     [ set  => { device => $_, rgb => '000000', led => 1, fade => 100 } ],
-  ) } qw( left mid right );
+  ) } qw( 0 1 2 3 );
 
   my $program = $bank->build_program([
     @west, [ sync => {} ], @east,
