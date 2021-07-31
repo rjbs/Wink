@@ -33,7 +33,7 @@ sub get_device {
   }
 
   confess("no device specification available") unless $which;
-  confess("unknown device type") unless $Via{$which};
+  confess(qq{unknown device type "$which"}) unless $Via{$which};
   return $Via{$which}->($how);
 }
 
