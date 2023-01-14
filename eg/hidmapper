@@ -16,23 +16,7 @@ unless ($opt->sn && $opt->sn->@*) {
 
 my @serials = $opt->sn->@*;
 
-my @devices = @ARGV;
-
-unless (@devices) {
-  die "You didn't specify any USB devices to mount!\n";
-}
-
-{
-  my @bad_devices = grep {; ! -w } @devices;
-
-  if (@bad_devices) {
-    my $error = "You don't seem to have write access to some devices!\n";
-    $error .= "- $_\n" for @bad_devices;
-    die $error;
-  }
-}
-
-my $map = get_serial_dev_map(\@devices);
+my $map = get_serial_dev_map();
 
 my @missing = grep {; ! $map->{$_} } @serials;
 
