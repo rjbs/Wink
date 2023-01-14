@@ -2,32 +2,47 @@
 use v5.30.0;
 use warnings;
 
-my @devices = grep {; -w } </dev/hidraw*>;
+use Getopt::Long::Descriptive;
+use Wink::Util qw(get_serial_dev_map);
 
-unless (@devices) {
-  die "You don't seem to have write access to any devices like /dev/hidraw*!\n";
+my ($opt, $usage) = describe_options(
+  '%c %o',
+  [ 'sn=s@', 'serial numbers, in order, to mount as device 0..n' ],
+);
+
+unless ($opt->sn && $opt->sn->@*) {
+  die "You didn't specify any serial numbers with --sn, so nothing to do!\n";
 }
 
-# I really don't like this.  My goal has generally been to avoid using the
-# blink command!  I know I could get the serial numbers of the devices without
-# using the command, but I'd have to understand how to read back the HID report
-# data from a serial number request.  (The HID report to write to get that is
-# { 2, 'U', 0 })
-#
-# Until I sort that out, let's just use the blink command so we can get things
-# back up and running after a long period of having this lying around busted.
-#
-# My personal bank of devices puts them, left to right, in this order:
-my @sn;
-$sn[0] = '3e427d6e';
-$sn[1] = '3597a3ff';
-$sn[2] = '3a0a4c6b';
-$sn[3] = '3f43c51b';
+my @serials = $opt->sn->@*;
 
-my @lines = `blink1 --list --verbose | grep 'serial:'`;
-my %map   = map {; m<'([0-9a-f]{8})' '(/dev/hidraw[0-9]+)'> && ($1, $2) } @lines;
+my @devices = @ARGV;
+
+unless (@devices) {
+  die "You didn't specify any USB devices to mount!\n";
+}
+
+{
+  my @bad_devices = grep {; ! -w } @devices;
+
+  if (@bad_devices) {
+    my $error = "You don't seem to have write access to some devices!\n";
+    $error .= "- $_\n" for @bad_devices;
+    die $error;
+  }
+}
+
+my $map = get_serial_dev_map(\@devices);
+
+my @missing = grep {; ! $map->{$_} } @serials;
+
+if (@missing) {
+  my $error = "Requested serial numbers not found:\n";
+  $error .= "- $_\n" for @missing;
+  die $error;
+}
 
 my $bank = join q{,},
-           map {; "$_:hidraw:$map{$sn[$_]}" } keys @sn;
+           map {; "$_:hidraw:$map->{$serials[$_]}" } keys @serials;
 
 say $bank;
