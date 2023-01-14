@@ -18,9 +18,20 @@ sub to_rgb ($arg) {
 }
 
 # pass me an arrayref of /dev/... devices on the usb bus
-sub get_serial_dev_map ($devices) {
+sub get_serial_dev_map () {
+  require Process::Status;
+
+  my @lines = `lsusb -d 27b8:01ed`;
+  Process::Status->assert_ok("listing USB devices");
+
+  my @devices;
+  for my $line (@lines) {
+    next unless $line =~ /^Bus ([0-9]+) Device ([0-9]+):/;
+    push @devices, "/dev/bus/usb/$1/$2";
+  }
+
   my %device;
-  DEV: for my $blink_dev (@$devices) {
+  DEV: for my $blink_dev (@devices) {
     my @info = `udevadm info $blink_dev`;
     my ($path)   = map {; /^P: (\S+)$/m ? $1 : () } @info;
     my ($serial) = map {; /ID_SERIAL_SHORT=([[:xdigit:]]+)/ ? $1 : () } @info;
