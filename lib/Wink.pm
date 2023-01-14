@@ -6,6 +6,7 @@ use warnings;
 use experimental qw(signatures);
 
 use Carp qw(confess);
+use Wink::Util;
 
 my %Via = (
   command => sub ($arg) {
@@ -38,17 +39,32 @@ sub get_device {
 }
 
 sub get_bank ($self) {
-  confess("\$WINK_BANK not defined") unless defined $ENV{WINK_BANK};
-
   my %device;
-  my @entries = split /,/, $ENV{WINK_BANK};
-  for my $entry (@entries) {
-    my ($name, $which, $how) = split /(?<!:):(?!:)/, $entry, 3;
 
-    confess(qq{device "$name" defined multiple times in \$WINK_BANK})
-      if $device{$name};
+  if ($ENV{WINK_SERIALS}) {
+    my @serials = split /,/, $ENV{WINK_SERIALS};
+    my $map   = Wink::Util::get_serial_dev_map();
+    my @paths = map {; $map->{$_} } @serials;
 
-    $device{$name} = $self->get_device($which, $how);
+    if (my @missing = grep {; ! $map->{$_} } @serials) {
+      confess("\$WINK_SERIALS specified missing serial numbers: @missing");
+    }
+
+    for my $i (keys @serials) {
+      $device{$i} = $self->get_device(hidraw => $map->{ $serials[$i] });
+    }
+  } elsif ($ENV{WINK_BANK}) {
+    my @entries = split /,/, $ENV{WINK_BANK};
+    for my $entry (@entries) {
+      my ($name, $which, $how) = split /(?<!:):(?!:)/, $entry, 3;
+
+      confess(qq{device "$name" defined multiple times in \$WINK_BANK})
+        if $device{$name};
+
+      $device{$name} = $self->get_device($which, $how);
+    }
+  } else {
+    confess("neither \$WINK_SERIALS nor \$WINK_BANK defined");
   }
 
   my $class;
