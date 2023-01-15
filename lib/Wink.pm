@@ -43,15 +43,14 @@ sub get_bank ($self) {
 
   if ($ENV{WINK_SERIALS}) {
     my @serials = split /,/, $ENV{WINK_SERIALS};
-    my $map   = Wink::Util::get_serial_dev_map();
-    my @paths = map {; $map->{$_} } @serials;
+    my @paths   = map {; "/dev/blink/$_" } @serials;
 
-    if (my @missing = grep {; ! $map->{$_} } @serials) {
-      confess("\$WINK_SERIALS specified missing serial numbers: @missing");
+    if (my @missing = grep { ! -e } @paths) {
+      confess("\$WINK_SERIALS led to missing paths: @missing");
     }
 
-    for my $i (keys @serials) {
-      $device{$i} = $self->get_device(hidraw => $map->{ $serials[$i] });
+    for my $i (keys @paths) {
+      $device{$i} = $self->get_device(hidraw => $paths[$i]);
     }
   } elsif ($ENV{WINK_BANK}) {
     my @entries = split /,/, $ENV{WINK_BANK};

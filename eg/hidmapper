@@ -3,7 +3,6 @@ use v5.30.0;
 use warnings;
 
 use Getopt::Long::Descriptive;
-use Wink::Util qw(get_serial_dev_map);
 
 my ($opt, $usage) = describe_options(
   '%c %o',
@@ -16,17 +15,17 @@ unless ($opt->sn && $opt->sn->@*) {
 
 my @serials = $opt->sn->@*;
 
-my $map = get_serial_dev_map();
+my @paths = map {; "/dev/blink/$_" } @serials;
 
-my @missing = grep {; ! $map->{$_} } @serials;
+my @missing = grep {; ! -e } @paths;
 
 if (@missing) {
-  my $error = "Requested serial numbers not found:\n";
+  my $error = "Devices for some requested serial numbers not found:\n";
   $error .= "- $_\n" for @missing;
   die $error;
 }
 
 my $bank = join q{,},
-           map {; "$_:hidraw:$map->{$serials[$_]}" } keys @serials;
+           map {; "$_:hidraw:$paths[$_]" } keys @paths;
 
 say $bank;
