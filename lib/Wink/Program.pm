@@ -1,6 +1,6 @@
 package Wink::Program;
 
-use v5.28.0;
+use v5.36.0;
 use Moose;
 
 use experimental qw(signatures);

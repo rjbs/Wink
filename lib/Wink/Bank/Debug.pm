@@ -1,6 +1,6 @@
 package Wink::Bank::Debug;
 
-use v5.30.0;
+use v5.36.0;
 use Moose;
 
 extends 'Wink::Bank';

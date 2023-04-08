@@ -1,7 +1,6 @@
 package Wink::Util;
 
-use v5.28.0;
-use warnings;
+use v5.36.0;
 
 use experimental qw(signatures);
 
